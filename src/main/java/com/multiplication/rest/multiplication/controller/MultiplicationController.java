@@ -1,4 +1,4 @@
-package com.multiplication.rest.controller;
+package com.multiplication.rest.multiplication.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

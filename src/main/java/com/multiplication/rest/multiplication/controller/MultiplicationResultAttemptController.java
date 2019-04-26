@@ -1,4 +1,4 @@
-package com.multiplication.rest.controller;
+package com.multiplication.rest.multiplication.controller;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
