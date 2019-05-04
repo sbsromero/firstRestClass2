@@ -1,5 +1,7 @@
 package com.multiplication.rest.multiplication.service;
 
+import java.util.List;
+
 import com.multiplication.rest.multiplication.domain.Multiplication;
 import com.multiplication.rest.multiplication.domain.MultiplicationResultAttempt;
 
@@ -18,6 +20,8 @@ public interface MultiplicationService {
      *         multiplication, false otherwise.
      */
     boolean checkAttempt(final MultiplicationResultAttempt resultAttempt);
+    
+    List<MultiplicationResultAttempt> getStatsForUser (String userAlias);
 
 }
 
