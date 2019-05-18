@@ -10,6 +10,8 @@ import org.springframework.util.Assert;
 import com.multiplication.rest.multiplication.domain.Multiplication;
 import com.multiplication.rest.multiplication.domain.MultiplicationResultAttempt;
 import com.multiplication.rest.multiplication.domain.User;
+import com.multiplication.rest.multiplication.event.EventDispatcher;
+import com.multiplication.rest.multiplication.event.MultiplicationSolvedEvent;
 import com.multiplication.rest.multiplication.repository.MultiplicationResultAttemptRepository;
 import com.multiplication.rest.multiplication.repository.UserRepository;
 
@@ -19,13 +21,16 @@ class MultiplicationServiceImpl implements MultiplicationService {
 	private RandomGeneratorService randomGeneratorService;
 	private UserRepository UserRepository;
 	private MultiplicationResultAttemptRepository attemptRepository;
+	private EventDispatcher eventDispatcher;
 
 	@Autowired
 	public MultiplicationServiceImpl(final RandomGeneratorService randomGeneratorService,
-			final UserRepository userRepository, final MultiplicationResultAttemptRepository attemptRepository) {
+			final UserRepository userRepository, final MultiplicationResultAttemptRepository attemptRepository,
+			final EventDispatcher eventDispatcher) {
 		this.randomGeneratorService = randomGeneratorService;
 		this.UserRepository = userRepository;
 		this.attemptRepository = attemptRepository;
+		this.eventDispatcher = eventDispatcher;
 	}
 
 	@Override
@@ -50,11 +55,21 @@ class MultiplicationServiceImpl implements MultiplicationService {
 				resultAttempt.getResultAttempt(), isCorrect);
 
 		attemptRepository.save(checkedAttempt);
+
+		// Communicates the result via Event
+		eventDispatcher.send(new MultiplicationSolvedEvent(checkedAttempt.getId(), checkedAttempt.getUser().getId(),
+				checkedAttempt.isCorrect()));
 		return isCorrect;
 	}
 
 	@Override
 	public List<MultiplicationResultAttempt> getStatsForUser(String userAlias) {
 		return attemptRepository.findTop5ByUserAliasOrderByIdDesc(userAlias);
+	}
+
+	@Override
+	public MultiplicationResultAttempt getResultById(final Long resultId) {
+		return attemptRepository.findById(resultId).orElseThrow(
+				() -> new IllegalArgumentException("The requested resultId [" + resultId + "]" + "doesn't exits."));
 	}
 }
